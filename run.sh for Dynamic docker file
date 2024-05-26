@@ -1,0 +1,19 @@
+#!/bin/bash
+
+V1=$(printf '%s' "$MQTT_HOST" | sed -e 's/[\/&]/\\&/g')
+V2=$(printf '%s' "$MQTT_PORT" | sed -e 's/[\/&]/\\&/g')
+V3=$(printf '%s' "$MQTT_USERNAME" | sed -e 's/[\/&]/\\&/g')
+V4=$(printf '%s' "$MQTT_PASSWORD" | sed -e 's/[\/&]/\\&/g')
+
+
+find /ui/dist/* -type f -exec sed -i "s/CONFIG_MQTT_HOST/${V1}/g" {} +
+find /ui/dist/* -type f -exec sed -i "s/CONFIG_MQTT_PORT/${V2}/g" {} +
+find /ui/dist/* -type f -exec sed -i "s/CONFIG_MQTT_USERNAME/${V3}/g" {} +
+find /ui/dist/* -type f -exec sed -i "s/CONFIG_MQTT_PASSWORD/${V4}/g" {} +
+
+find /ui/.output/public/* -type f -exec sed -i "s/CONFIG_MQTT_HOST/${V1}/g" {} +
+find /ui/.output/public/* -type f -exec sed -i "s/CONFIG_MQTT_PORT/${V2}/g" {} +
+find /ui/.output/public/* -type f -exec sed -i "s/CONFIG_MQTT_USERNAME/${V3}/g" {} +
+find /ui/.output/public/* -type f -exec sed -i "s/CONFIG_MQTT_PASSWORD/${V4}/g" {} +
+
+npx http-server -p 80 /ui/dist/
