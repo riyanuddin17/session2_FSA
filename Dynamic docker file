@@ -1,0 +1,31 @@
+FROM public.ecr.aws/docker/library/node:16.15.0
+
+RUN npm install -g http-server
+
+WORKDIR /ui
+
+COPY package*.json ./
+
+RUN npm install
+
+# install nano, just so we can edit deployed files
+RUN apt-get update
+RUN apt-get install nano
+
+COPY . .
+
+RUN touch ./.env
+
+RUN echo "MQTT_HOST='CONFIG_MQTT_HOST'" >> .env
+RUN echo "MQTT_PORT='CONFIG_MQTT_PORT'" >> .env
+RUN echo "MQTT_USERNAME='CONFIG_MQTT_USERNAME'" >> .env
+RUN echo "MQTT_PASSWORD='CONFIG_MQTT_PASSWORD'" >> .env
+
+RUN npm run build
+
+RUN npm run generate
+
+# Serve the application using Node.js
+EXPOSE 80
+
+CMD [ "./run.sh" ]
