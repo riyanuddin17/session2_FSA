@@ -1,4 +1,6 @@
-FROM public.ecr.aws/docker/library/node:16.15.0
+FROM node:18-slim
+
+RUN npm install -g http-server
 
 WORKDIR /ui
 
@@ -8,11 +10,17 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
+RUN touch ./.env
 
-RUN npm run generate
+RUN echo "MQTT_HOST='CONFIG_MQTT_HOST'" >> .env \
+    && echo "MQTT_PORT='CONFIG_MQTT_PORT'" >> .env \
+    && echo "MQTT_USERNAME='CONFIG_MQTT_USERNAME'" >> .env \
+    && echo "MQTT_PASSWORD='CONFIG_MQTT_PASSWORD'" >> .env
 
-# Serve the application using Node.js
+
+RUN npm run build \
+    && npm run generate
+
 EXPOSE 80
 
-CMD ["npx", "http-server", "-p", "80", "./.output/public"]
+CMD [ "./run.sh" ]
