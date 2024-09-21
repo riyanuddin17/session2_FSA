@@ -1,6 +1,6 @@
 
 module "vpc" {
-  source = "./VPC"
+  source = "../modules/VPC"
 }
 module "aws_instance_1" {
   source                      = "../modules/EC2"
