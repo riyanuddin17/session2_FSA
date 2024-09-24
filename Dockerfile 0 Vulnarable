@@ -1,0 +1,30 @@
+FROM node:lts-alpine3.20
+
+RUN npm install -g http-server
+
+RUN apk add --no-cache bash
+
+WORKDIR /ui
+
+COPY package.json ./
+
+RUN npm install nuxt
+
+RUN npm install
+
+RUN npm install --platform=linux --arch=x64 sharp
+
+COPY . .
+
+RUN chmod +x run.sh && rm .env
+
+RUN touch ./.env
+
+RUN echo "API_URL='CONFIG_API_URL'" >> .env
+
+RUN npm run build \
+    && npm run generate
+
+EXPOSE 80
+
+CMD [ "./run.sh" ]
