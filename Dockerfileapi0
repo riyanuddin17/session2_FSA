@@ -1,0 +1,48 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt install -y python3 python3-pip libgl1-mesa-glx libgtk2.0-dev libpq-dev libglib2.0-0 wget
+
+RUN wget http://archive.ubuntu.com/ubuntu/pool/universe/p/pmix/libpmix2_5.0.0~rc1-2_amd64.deb
+
+RUN python3 -m pip install --upgrade pip
+
+RUN apt update && apt install -y python3-opencv
+
+COPY requirments.txt ./
+
+RUN python3 -m pip install --user --no-cache-dir -r requirments.txt
+
+RUN dpkg -i --force-depends libpmix2_5.0.0~rc1-2_amd64.deb || true
+
+WORKDIR /usr/src/app
+RUN pip install passlib --user
+RUN pip install flask-restx
+RUN pip install pyarmor==6.8.1
+RUN pip install cryptography
+
+COPY . .
+
+RUN python3 -m pip install --user psycopg2-binary pyjwt
+
+RUN pyarmor obfuscate *.py
+RUN rm -r *.py
+RUN mv dist/* .
+
+RUN pyarmor obfuscate ./dba/*.py
+RUN rm -r ./dba/*.py
+RUN mv dist/* ./dba/
+
+RUN pyarmor obfuscate ./inference/*.py
+RUN rm -r ./inference/*.py
+RUN mv dist/* ./inference/
+
+RUN pyarmor obfuscate ./resources/*.py
+RUN rm -r ./resources/*.py
+RUN mv dist/* ./resources/
+
+RUN pyarmor obfuscate ./training/*.py
+RUN rm -r ./training/*.py
+RUN mv dist/* ./training/
+CMD ["./run.sh"]
