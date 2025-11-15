@@ -1,0 +1,52 @@
+ansible FE -m package -a "name=git state=presenrt" -b
+
+ansible FE -m git -a "repo=https://github.com/abdellatif-laghjaj/todo-list.git dest=/var/www/html/" -b
+
+ansible FE -m command -a "systemctl start httpd" -b
+
+ansible FE -m service -a "name=httpd state=started" -b
+
+ansible FE -m copy -a "src=/home/host/* dest=/home/ " -b
+
+ansible FE -m file -a "path=/home/riyan/ state=touch" -b
+
+ansible -i myhostamazon FE -m package -a "name=git state=presenrt" -b
+
+
+
+Playbook:
+
+---
+- name: To understand playbook
+  hosts: FE
+  become: yes
+  tasks:
+    - name: To install httpd and git
+      dnf:
+        name: httpd
+        state: present
+        ignore_errors: yes
+        name: git
+        state: present
+
+    - name: To clone repo to destination
+      git:
+        repo: https://github.com/riyanuddin17
+        dest: /var/www/html
+      notify: To restart the service
+
+  handlers:
+    - name: To restart the service
+      service:
+        name: httpd
+        state: restarted
+---
+
+
+>> absible-playbook -i <custom_inventory> myplaybook.yml
+
+𝗠𝗼𝗿𝗲 𝗘𝘅𝗮𝗺𝗽𝗹𝗲𝘀:
+https://medium.com/@santosh.nalam/ansible-cheat-sheet-vital-vm-actions-part-1-ffc9c37e852f
+
+𝗔𝗻𝘀𝗶𝗯𝗹𝗲 𝗥𝗼𝗹𝗲𝘀 𝗗𝗼𝗰𝘂𝗺𝗲𝗻𝘁𝗮𝘁𝗶𝗼𝗻:
+https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_reuse_roles.html#id3
